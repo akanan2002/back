@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id        Int     @id @default(autoincrement())
+    username  String  @unique @db.VarChar(150)
+    password  String  @db.VarChar(72)
+    email     String
+    styles    Style[]
+
+    @@map("users")
+}
+
+model Style {
+    id            Int            @id @default(autoincrement())
+    style_name    String
+    User          User?          @relation(fields: [userId], references: [id])
+    userId        Int?
+    target_groups Target_group[]
+
+    @@map("styles")
+}
+
+model Target_group {
+    id             Int              @id @default(autoincrement())
+    gender         String
+    age            String
+    Taste          String
+    Style          Style?           @relation(fields: [styleId], references: [id])
+    styleId        Int?
+    Dressing_steps Dressing_steps[]
+
+    @@map("Target_groups")
+}
+
+model Dressing_steps {
+    id                Int                 @id @default(autoincrement())
+    chooseclothes     String
+    makeup            String
+    hairstyle         String
+    Target_group      Target_group?       @relation(fields: [target_groupId], references: [id])
+    target_groupId    Int?
+    Examples_obtained Examples_obtained[]
+
+    @@map("Dressing_steps")
+}
+
+model Examples_obtained {
+    id                 Int                 @id @default(autoincrement())
+    sample_received    Int
+    refer_id           String
+    Dressing_steps     Dressing_steps?     @relation(fields: [dressing_stepsId], references: [id])
+    dressing_stepsId   Int?
+    savethe_images     Savethe_image[]
+    additional_advices Additional_advice[]
+    citingthesources   Citingthesource[]
+
+    @@map("Examples_obtaineds")
+}
+
+model Savethe_image {
+    id                  Int                @id @default(autoincrement())
+    url                 String
+    sharephotos         String
+    device              String
+    examples_obtaineds  Examples_obtained? @relation(fields: [examples_obtainedId], references: [id])
+    examples_obtainedId Int?
+    comments            Comment[]
+
+    @@map("savethe_images")
+}
+
+model Additional_advice {
+    id                  Int                @id @default(autoincrement())
+    hair_color          String
+    clothes             String
+    Examples_obtained   Examples_obtained? @relation(fields: [examples_obtainedId], references: [id])
+    examples_obtainedId Int?
+
+    @@map("Additional_advices")
+}
+
+model Citingthesource {
+    id                  Int                @id @default(autoincrement())
+    source              String
+    Examples_obtained   Examples_obtained? @relation(fields: [examples_obtainedId], references: [id])
+    examples_obtainedId Int?
+
+    @@map("Citingthesources")
+}
+
+model Comment {
+    id              Int            @id @default(autoincrement())
+    coment          Int
+    contact         String
+    givearating     Int
+    Savethe_image   Savethe_image? @relation(fields: [savethe_imageId], references: [id])
+    savethe_imageId Int?
+
+    @@map("comments")
+}
